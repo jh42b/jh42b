@@ -1,0 +1,579 @@
+<html>
+<title>GES Shipping Weight Calculator</title>
+<style>
+img.resize{
+    width:540px; /* you can use % */
+    height: auto;
+}
+</style>
+<script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js'></script>
+<script type="text/javascript">
+
+var timeout = setTimeout("location.reload(true);",2700000); // 60000 = 1 minute
+function resetTimeout() {
+	clearTimeout(timeout);
+	timeout = setTimeout("location.reload(true);",2700000);
+}
+
+function reset() {
+	$("#dim1").val("");
+	$("#dim2").val("");
+	$("#dim3").val("");
+	$('#pf1').attr('checked', true);
+	$('#pf2').attr('checked', true);
+	$('#pf3').attr('checked', true);
+	$("#realweight").val("");
+	$('#twobox').attr('checked', false);
+	$('#nofour').attr('checked', false);
+	var $radios = $('input:radio[name=type]');
+	$radios.filter('[value=general]').prop('checked', true);
+	document.getElementById("nofourname").innerHTML = "Ship in own (current) box";
+	document.getElementById("totdim1").innerHTML = 4;
+	document.getElementById("totdim2").innerHTML = 4;
+	document.getElementById("totdim3").innerHTML = 4;
+	document.getElementById("dimweight").innerHTML = "";
+	document.getElementById("dispweight").innerHTML = "";
+	document.getElementById("note").innerHTML = "";
+	document.getElementById("note2").innerHTML = "";
+	document.getElementById("mediarate").innerHTML = "";
+	$('.resize').hide();
+	$('#image_general').show();
+	document.getElementById("boxnote").innerHTML = "";
+}
+
+function calculate() {
+
+}
+
+function media() {
+	realweight = document.getElementById("realweight").value;
+	if (realweight > 0) {
+		var price = " See manager";
+		if (realweight <= 3) {
+			price = " $3.99";
+		} else if (realweight <= 6) {
+			price = " $5.99";
+		} else if (realweight <= 10) {
+			price = " $7.99";
+		} else if (realweight <= 13) {
+			price = " $8.99";
+		} else if (realweight <= 15) {
+			price = " $9.99";
+		} else if (realweight < 20) {
+			price = " $11.99";
+		} else if (realweight < 25) {
+			price = " $15.99";
+		}
+		document.getElementById("mediarate").innerHTML = price;
+	}
+}
+
+$(document).ready(function(){ 	
+	$("#dim1").val("");
+	$("#dim2").val("");
+	$("#dim3").val("");
+	$('#pf1').attr('checked', true);
+	$('#pf2').attr('checked', true);
+	$('#pf3').attr('checked', true);
+	$("#realweight").val("");
+	$('#twobox').attr('checked', false);
+	$('#nofour').attr('checked', false);
+	$('.resize').hide();
+	$('#image_general').show();
+	var $radios = $('input:radio[name=type]');
+	$radios.filter('[value=general]').prop('checked', true);
+/*	var $radios = $('input:radio');
+    if($radios.is(':checked') === false) {
+        $radios.filter('[value=general]').prop('checked', true);
+    }*/
+	$("input:radio").change(function() {
+		document.getElementById("mediarate").innerHTML = "";
+		$('#nofour').attr('checked', false);
+		document.getElementById("nofourname").innerHTML = "Ship in own (current) box";
+	});
+	$( ".input" ).change(function() {
+		$('.resize').hide();
+		resetTimeout();
+		dimweight = 0;
+		pickup = "no";
+		note="";
+  // Check input( $( this ).val() ) for validity here
+		var dim1 = document.getElementById("dim1"),
+			dim2 = document.getElementById("dim2"),
+			dim3 = document.getElementById("dim3"),
+			chk1 = document.getElementById("pf1"),
+			chk2 = document.getElementById("pf2"),
+			chk3 = document.getElementById("pf3"),
+			weight = document.getElementById("weight"),
+			realweight = document.getElementById("realweight"),
+			twobox = document.getElementById("twobox"),
+			nofour = document.getElementById("nofour"),
+			nofourreset = document.getElementById("nofourreset"),
+			note2base = "",
+			plus1 = 0,
+			plus2 = 0,
+			plus3 = 0,
+			flargn = 0,
+			noresetfour = "no",
+			dim1a = document.getElementById("dim1a"),
+			dim2a = document.getElementById("dim2a"),
+			dim3a = document.getElementById("dim3a"),
+			dim1b = document.getElementById("dim1b"),
+			dim2b = document.getElementById("dim2b"),
+			dim3b = document.getElementById("dim3b"),
+			bigguitar = "no";
+		type = $('input[name="type"]:checked').val();
+		var origtype = type;
+		if (nofour.checked == true) {
+			$("#dim1b").val(dim1.value);
+			$("#dim2b").val(dim2.value);
+			$("#dim3b").val(dim3.value);
+			if (nofourreset.value == "") {
+				$("#dim1a").val(dim1.value);
+				$("#dim2a").val(dim2.value);
+				$("#dim3a").val(dim3.value);
+				$("#nofourreset").val("yes");
+			} else if (1 == 2) {
+				if(dim1a.value != dim1b.value && dim2a.value != dim2b.value && dim3a.value != dim3b.value) {
+					document.getElementById("mediarate").innerHTML = "";
+					$('#nofour').attr('checked', false);
+					document.getElementById("nofourname").innerHTML = "Ship in own (current) box";
+					$("#nofourreset").val("yes");
+					nofour = document.getElementById("nofour");
+					nofourreset = document.getElementById("nofourreset");
+				}
+			}
+		}
+		if (type != "general") {
+			if (type != "frame") {
+				$('#nofourcontainer').hide();
+			}
+			$('#pf1').attr('checked', false);
+			$('#pf2').attr('checked', false);
+			$('#pf3').attr('checked', false);
+		} else {
+			$('#nofourcontainer').show();
+			$('#pf1').attr('checked', true);
+			$('#pf2').attr('checked', true);
+			$('#pf3').attr('checked', true);
+// check?
+		}
+		if (type == "lot") {
+			$("#dim1").attr('disabled', true);
+			$("#dim2").attr('disabled', true);
+			$("#dim1").val("---");
+			$("#dim2").val("---");
+		} else {
+			$("#dim1").attr('disabled', false);
+			$("#dim2").attr('disabled', false);
+			if (dim1.value == "---") {
+				dim1.value = "";
+				$("#dim1").val("");
+			}
+			if (dim2.value == "---") {
+				dim2.value = "";
+				$("#dim2").val("");
+			}
+		}
+		if (nofour.checked == true && type == "general") {
+			$('#pf1').attr('checked', true);
+			$('#pf2').attr('checked', true);
+			$('#pf3').attr('checked', true);
+			chk1.checked = true;
+			chk2.checked = true;
+			chk3.checked = true;
+			document.getElementById("pf1b").innerHTML = "<font color='black'>+1&quot;</font>";
+			document.getElementById("pf2b").innerHTML = "<font color='black'>+1&quot;</font>";
+			document.getElementById("pf3b").innerHTML = "<font color='black'>+1&quot;</font>";
+			plus1 = 1;
+			plus2 = 1;
+			plus3 = 1;
+			flargn = "yes"; // I don't know what to call this very very temporary variable, but it exists only to separate this conditional from the previous if/else and allows the too thick case to fall back to regular frame shipping
+		} else if (nofour.checked == true && type == "frame") {
+			if(dim3.value > 1) {
+				alert("This item is too thick to ship this way!");
+				$('#nofour').attr('checked', false);
+				nofour.checked == false;
+			} else {
+				$('#pf1').attr('checked', true);
+				$('#pf2').attr('checked', true);
+				$('#pf3').attr('checked', false);
+				chk1.checked = true;
+				chk2.checked = true;
+				chk3.checked = false;
+				document.getElementById("pf1b").innerHTML = "<font color='black'>+3&quot;</font>";
+				document.getElementById("pf2b").innerHTML = "<font color='black'>+3&quot;</font>";
+				document.getElementById("pf3b").innerHTML = "<font color='black'>+0&quot;</font>";
+				plus1 = 3;
+				plus2 = 3;
+				plus3 = 0;
+				flargn = "yes"; // I don't know what to call this very very temporary variable, but it exists only to separate this conditional from the previous if/else and allows the too thick case to fall back to regular frame shipping
+			}
+		}
+		if (flargn != "yes") {
+			if (chk1.checked == true) {
+				plus1 = 4;
+				document.getElementById("pf1b").innerHTML = "<font color='black'>+4&quot;</font>";
+			} else {
+				plus1 = 0;
+				document.getElementById("pf1b").innerHTML = "<font color='grey'>+4&quot;</font>";
+			}
+			if (chk2.checked == true) {
+				plus2 = 4;
+				document.getElementById("pf2b").innerHTML = "<font color='black'>+4&quot;</font>";
+			} else {
+				plus2 = 0;
+				document.getElementById("pf2b").innerHTML = "<font color='grey'>+4&quot;</font>";
+			}
+			if (chk3.checked == true) {
+				plus3 = 4;
+				document.getElementById("pf3b").innerHTML = "<font color='black'>+4&quot;</font>";
+			} else {
+				plus3 = 0;
+				document.getElementById("pf3b").innerHTML = "<font color='grey'>+4&quot;</font>";
+			}
+		}
+		dim1val = dim1.value.replace(/[^\d.-]/g, '');
+		dim2val = dim2.value.replace(/[^\d.-]/g, '');
+		dim3val = dim3.value.replace(/[^\d.-]/g, '');
+		weightval = realweight.value.replace(/[^\d.-]/g, '');
+		displayweight = weightval;
+		weightval = (weightval * 1) + 2;
+		total1 = Math.ceil(dim1val*1+plus1*1);
+		total2 = Math.ceil(dim2val*1 + plus2*1);
+		total3 = Math.ceil(dim3val*1 + plus3*1);
+		if (nofour.checked == true && type == "frame") {
+			total3 = 1;
+		}
+		document.getElementById("totdim1").innerHTML = total1;
+		document.getElementById("totdim2").innerHTML = total2;
+		document.getElementById("totdim3").innerHTML = total3;
+		if (type == "lot") {
+			list = [18, 24, total3]
+		} else {
+			list = [total1, total2, total3];
+			list.sort(function(a, b){return a-b});
+		}
+		big = list[0]*2;
+		bigger = list[1]*2;
+		biggest = list[2];
+		if (type == "long") {
+			document.getElementById("longnote").innerHTML = "<font color='blue'><b>NOTE: Please enter the length of the item into the Dimension 3 box!</b></font>";
+		} else {
+			document.getElementById("longnote").innerHTML = "";
+		}
+		if (type == "guitar") {
+			
+			if ((list[1] <= 17) && (list[2] <= 36)) {
+				type = "general";
+				list[0] = list[0] + 4;
+				list[1] = list[1] + 4;
+				list[2] = list[2] + 4;
+				document.getElementById("totdim1").innerHTML = list[0];
+				document.getElementById("totdim2").innerHTML = list[1];
+				document.getElementById("totdim3").innerHTML = list[2];
+				$('#pf1').attr('checked', true);
+				$('#pf2').attr('checked', true);
+				$('#pf3').attr('checked', true);
+			} else if ((list[0]  <=6) && (list[1]  <= 17) && (list[2]  <= 42)) {
+				dimweight = 37;
+			} else if ((list[0]  <=8) && (list[1]  <= 20) && (list[2]  <= 48)) {
+				dimweight = 59; // These dimensions (9x21x51) flummox both this calculator and SGW's.
+								// Both list 90lbs., but 57 is correct per UPS's shipping cost calculator.
+			} else {
+				type = "general";
+				bigguitar = "yes";
+//				alert(list[0] + ", " + list[1] + ", " + list[2]);
+				list[0] = list[0] + 4;
+				list[1] = list[1] + 4;
+				list[2] = list[2] + 4;
+				$('#pf1').attr('checked', true);
+				$('#pf2').attr('checked', true);
+				$('#pf3').attr('checked', true);
+
+				document.getElementById("totdim1").innerHTML = list[0];
+				document.getElementById("totdim2").innerHTML = list[1];
+				document.getElementById("totdim3").innerHTML = list[2];
+			}
+		} else if (type == "frame") {
+// It is NOT working to try to estimate weight based on cut-down boxes. Based on UPS's own calculations it seems the large art boxes should be 90 pounds, but ULINE doesn't reflect this, and the calculator at http://www.theupsstore.com/ctc/pages/estimate-shipping-cost.aspx doesn't either. I don't get it and we're going to have to just go with the base weight of the box.
+			if (list[0] > 5) {
+				type = "general"; // too thick
+				pickup = "yes";
+				list[0] = list[0] + 4;
+				list[1] = list[1] + 4;
+				list[2] = list[2] + 4;
+				$('#pf1').attr('checked', true);
+				$('#pf2').attr('checked', true);
+				$('#pf3').attr('checked', true);
+
+			} else if ((list[1] <= 20) && (list[2] <= 20)) {
+				type = "general"; // small enough to fit in small art box (24x24)
+				list[0] = list[0] + 4;
+				list[1] = list[1] + 4;
+				list[2] = list[2] + 4;
+				$('#pf1').attr('checked', true);
+				$('#pf2').attr('checked', true);
+				$('#pf3').attr('checked', true);
+			} else if ((list[1] <= 20) && (list[2] <= 26)) {
+				list[0] = 6;
+				list[1] = Math.min(21, list[1] + 5);
+				list[2] = 30;
+				document.getElementById("totdim1").innerHTML = list[0];
+				document.getElementById("totdim2").innerHTML = list[1];
+				document.getElementById("totdim3").innerHTML = list[2];
+				dimweight = 33; // 21x26 or smaller: medium art box (25x30)
+			} else if ((list[1] <= 26) && (list[2] <= 32)) {
+				list[0] = 6;
+				list[1] = Math.min(30, (list[1]*1)+5);
+				list[2] = 36;
+				document.getElementById("totdim1").innerHTML = list[0];
+				document.getElementById("totdim2").innerHTML = list[1];
+				document.getElementById("totdim3").innerHTML = list[2];
+				dimweight = 42; // 26x32 or smaller: large art box (30x36)
+			} else {
+				type = "general";
+				if (nofour.checked == false) {
+					pickup = "yes"; // too large to fit in a large art box
+					list[0] = list[0] + 4;
+					list[1] = list[1] + 4;
+					list[2] = list[2] + 4;
+					$('#pf1').attr('checked', true);
+					$('#pf2').attr('checked', true);
+					$('#pf3').attr('checked', true);
+				}
+			}
+			document.getElementById("nofourname").innerHTML = "Ship between cardboard (CHECK WITH SHIPPING)";
+			noresetfour = "yes";
+		} else if (type == "lot") {
+			list[0] = 18;
+			list[1] = 24;
+			list[2] = list[2] + 4;
+			document.getElementById("totdim1").innerHTML = list[0];
+			document.getElementById("totdim2").innerHTML = list[1];
+			document.getElementById("totdim3").innerHTML = list[2];
+			volume = list[0] * list[1] * list[2];
+			dimweight = volume / 166;
+			if((big*1+bigger*1+biggest*1) > 129) {
+				dimweight = 90;
+			}
+			returnweight = Math.ceil(dimweight);
+			returnweight = Math.max(returnweight, 4);
+			if (twobox.checked == true) {
+				returnweight = returnweight*1 + 28;
+			}
+			returnweight = Math.max(returnweight, weightval);
+			document.getElementById("lotweight").innerHTML = returnweight;
+			document.getElementById("dispweight").innerHTML = displayweight;
+			$('#pf3').attr('checked', true);
+		} else if (type == "long") {
+			if (list[1] > 12) {
+				pickup = "yes";
+				dimweight = 90;
+				type = "general";
+			} else if (list[1] > 8) {
+				list[0] = 12;
+				list[1] = 12;
+				list[2] = list[2] + 4;
+				document.getElementById("totdim1").innerHTML = list[0];
+				document.getElementById("totdim2").innerHTML = list[1];
+				document.getElementById("totdim3").innerHTML = list[2];
+				$('#pf3').attr('checked', true);
+				type = "general";
+			} else {
+				list[0] = 8;
+				list[1] = 8;
+				list[2] = list[2] + 4;
+				document.getElementById("totdim1").innerHTML = list[0];
+				document.getElementById("totdim2").innerHTML = list[1];
+				document.getElementById("totdim3").innerHTML = list[2];
+				$('#pf3').attr('checked', true);
+				type = "general";
+			}
+		}
+		if(type != "lot") {
+			document.getElementById("lotweight").innerHTML = "";
+			document.getElementById("dispweight").innerHTML = displayweight;
+		}
+		$('.resize').hide();
+			if (origtype == "guitar") {
+				$('#image_guitar').show();
+			} else if (origtype == "frame") {
+				$('#image_print').show();
+			} else if (origtype == "lot") {
+				$('#image_lot').show();
+			} else if (origtype == "long") {
+				$('#image_rug').show();
+			} else {
+				$('#image_general').show();
+			}
+		if (type == "general") {
+			if (noresetfour == "no") {
+				document.getElementById("nofourname").innerHTML = "Ship in own (current) box";
+			}
+			oversize1 = bigger+biggest;
+			oversize2 = big+bigger+biggest;
+			var note = "";
+			var oversizeweight = 0;
+			if (type == "frame" && nofour == "yes") {
+				// do nothing
+			} else if(oversize1 > 129) {
+				note = "This item MIGHT be oversized. If so, its MINIMUM weight should be 90 pounds.";
+				if(oversize2 > 129) {
+					note = "This item is definitely oversized. Its MINIMUM weight should be 90 pounds.";
+					oversizeweight = 90;
+				}
+			}
+			volume = list[0] * list[1] * list[2];
+			dimweight = volume / 166;
+			if (oversizeweight > dimweight) {
+				returnweight = oversizeweight;
+			} else {
+				returnweight = dimweight;
+			}
+			if (twobox.checked == true) {
+				returnweight = returnweight*1 + 28;
+			}
+			returnweight = Math.max(returnweight, weightval);
+			note2 = "";
+			note = "";
+		} else {
+			
+			
+			returnweight = dimweight*1;
+			if (twobox.checked == true) {
+				returnweight = returnweight*1 + 28;
+			}
+			document.getElementById("dimweight").innerHTML = returnweight;
+			document.getElementById("dispweight").innerHTML = displayweight;
+		}
+		returnweight = Math.ceil(returnweight);
+		returnweight = Math.max(returnweight, 4);
+		var note2 = ""
+		if (pickup == "yes") {
+			dimweight=90;
+			returnweight="9999";
+			note = "<b><font color='red'>This item should most likely be pickup only.</font></b> Double-check with a manager.";
+			note2base = "";
+		} else if (bigguitar == "yes") {
+			note2 = "<b><font color='red'>This guitar is too large to fit into a guitar box.</font></b> Please ask a manager.";
+		} else {
+		}
+
+		if (dim1val > 0 && dim2val > 0 && dim3val > 0) {
+			if (volume <= 5184) {
+				if (oversizeweight < 90) {
+					note2 = note2base;
+				}
+			}
+			returnweight = Math.max(returnweight, weightval);
+			document.getElementById("dimweight").innerHTML = returnweight;
+			document.getElementById("dispweight").innerHTML = displayweight;
+		} else {
+			returnweight = Math.max(returnweight, weightval);
+			document.getElementById("dimweight").innerHTML = "";
+			document.getElementById("dispweight").innerHTML = displayweight;
+		}
+		document.getElementById("note").innerHTML = note;
+		document.getElementById("note2").innerHTML = note2;
+		if (type == "general") {
+			newlist = [];
+			newlist[0] = (list[0]*1) - (plus1*1);
+			newlist[1] = (list[1]*1) - (plus2*1);
+			newlist[2] = (list[2]*1) - (plus3*1);
+			if (newlist[0] == "" || newlist[1] == "" || newlist[2] == "") {
+				document.getElementById("boxnote").innerHTML = "";
+			} else if (newlist[0] <= 1.25 && newlist[1] <= 4.75 && newlist[2] <= 8.25) {
+				document.getElementById("boxnote").innerHTML = "<br><b><font color='blue'>This item <i><u><font size=4.5>may</font></u></i> fit in a small ($5.95) flat-rate box.</font> <font size=5.5 color='red'>Use discretion.</font></b>";
+			} else if (newlist[0] <= 3.25 && newlist[1] <= 11.75 && newlist[2] <= 13.25) {
+				document.getElementById("boxnote").innerHTML = "<br><b><font color='blue'>This item <i><u><font size=4.5>may</font></u></i> fit in a medium ($12.35) flat-rate box.</font> <font size=5.5 color='red'>Use discretion.</font></b>";
+			} else if (newlist[0] <= 5.25 && newlist[1] <= 11.75 && newlist[2] <= 11.75) {
+				// document.getElementById("boxnote").innerHTML = "<br><b>This item may fit in a large ($17.50) flat-rate box.</b>";
+				// large flat-rate boxes aren't really a significant savings over UPS
+				document.getElementById("boxnote").innerHTML = "";
+			} else {
+				document.getElementById("boxnote").innerHTML = "";
+			}
+		
+		}
+	});
+	
+});
+</script>
+<table><tr><td style="vertical-align:top" width=650>
+<font size=5><b>Please use the item's real dimensions.</b></font><br>
+<div id="longnote"></div>
+Item type:<br>
+<span style="position:relative; left:25"><input type="radio" name="type" id="type" class="input" value="general" CHECKED> General <input type="radio" name="type" id="type" class="input" value="guitar"> Guitar <input type="radio" name="type" id="type" class="input" value="frame"> Print/framed item <input type="radio" name="type" id="type" class="input" value="lot"> Large lot <input type="radio" name="type" id="type" class="input" value="long"> Rug/long item</span><br>
+Dimension 1:&nbsp;&nbsp;&nbsp;<input type="text" name="dim1" id="dim1" class="input"> <input type="checkbox" name="pf1" id="pf1" class="input" CHECKED tabindex="-1"><span id="pf1b">+4"</span> = <span id="totdim1">4</span><br>
+Dimension 2:&nbsp;&nbsp;&nbsp;<input type="text" name="dim2" id="dim2" class="input"> <input type="checkbox" name="pf2" id="pf2" class="input" CHECKED tabindex="-1"><span id="pf2b">+4"</span> = <span id="totdim2">4</span><br>
+Dimension 3:&nbsp;&nbsp;&nbsp;<input type="text" name="dim3" id="dim3" class="input"> <input type="checkbox" name="pf3" id="pf3" class="input" CHECKED tabindex="-1"><span id="pf3b">+4"</span> = <span id="totdim3">4</span><br>
+Actual weight: <input type="text" name="realweight" id="realweight" class="input"><br>
+Check this box if the item needs to be shipped in two boxes: <input type="checkbox" name="twobox" id="twobox" class="input"><br>
+<span id="nofourcontainer"><span id="nofourname">Ship in own (current) box</span>: <input type="checkbox" name="nofour" id="nofour" class="input"><br></span>
+<input type="hidden" id="dim1a" value="0">
+<input type="hidden" id="dim1b" value="0">
+<input type="hidden" id="dim2a" value="0">
+<input type="hidden" id="dim2b" value="0">
+<input type="hidden" id="dim3a" value="0">
+<input type="hidden" id="dim3b" value="0">
+<input type="hidden" id="nofourreset" value="">
+<button onclick="javascript:update();">Calculate</button></br>
+<button onclick="javascript:reset();">Reset values</button><br>
+Shipping weight: <b><span id="dimweight"></span><span id="lotweight"></span> lbs.</b><br>
+Display weight: <b><span id="dispweight"></span> lbs.</b>
+<div id="note"></div>
+<div id="note2"></div>
+<div id="boxnote"></div>
+<br>
+<span style="position:relative; left:0;"><button onclick="javascript:media();">Click to calculate media rate</button></span> <span id="mediarate" style="position:relative; left:15"></span><br>
+<br>
+<br>
+<center>
+<img src="http://i.imgur.com/oXIWZDe.jpg" id="image_general" class="resize" style="display:none;">
+<img src="http://i.imgur.com/43KKoMn.jpg" id="image_guitar" class="resize" style="display:none;">
+<img src="http://i.imgur.com/4YpScYx.jpg" id="image_print" class="resize" style="display:none;">
+<img src="http://i.imgur.com/M9MEOtn.jpg" id="image_lot" class="resize" style="display:none;">
+<img src="http://i.imgur.com/EabPcN2.jpg" id="image_rug" class="resize" style="display:none;">
+</center>
+
+</td>
+<td style="vertical-align:top">
+<font size=5><b>USPS flat-rate packages:</b></font><br>
+<b>Small flat-rate box:</b><br>
+<span style="position:relative; left:15;">5" by 8.5" by 1.5"</span><br>
+<span style="position:relative; left:15;">$5.95</span><br>
+<b>Small flat-rate envelope:</b><br>
+<span style="position:relative; left:15;">Dimensions variable; please check manually</span><br>
+<span style="position:relative; left:15;">$5.95</span><br>
+<b>Medium flat-rate box:</b><br>
+<span style="position:relative; left:15;">12" by 13.5" by 3.5"</span><br>
+<span style="position:relative; left:15;">$12.35</span><br>
+<b>Large flat-rate box:</b><br>
+<span style="position:relative; left:15;">12" by 12" by 5.5"</span><br>
+<span style="position:relative; left:15;">$17.45</span><br>
+<i>Use only if item <b>with packing materials as necessary</b> can fit in these dimensions</i><br>
+<br>
+<br>
+<br>
+<br>
+<font size=5><b>Other shipping rates:</b></font><br>
+<b>Media mail:</b><br>
+<span style="position:relative; left:15;">DVDs, CDs, records, non-antique books, sheet music - NOT comic books</span><br>
+<!--span style="position:relative; left:15;">$3.99</span><br-->
+<span style="position:relative; left:15;">Variable - based on weight</span><br>
+
+<b>Small/light clothing, e.g. t-shirts:</b>
+<span style="position:relative; left:91;">$4.99</span><br>
+<b>Slightly heavier clothing, e.g. pairs of jeans:</b>
+<span style="position:relative; left:15;">$6.99</span><br>
+
+<b>Short fur coats:</b>
+<span style="position:relative; left:15;">13 lbs.</span><br>
+<b>Long fur coats:</b>
+<span style="position:relative; left:18;">24 lbs.</span><br>
+
+</td></tr></table>
+
+<br>
+<span style="position:absolute; bottom:15; left:47%; text-align: center"><font size=1><i>Updated 2/06/2015</i></font></span>
